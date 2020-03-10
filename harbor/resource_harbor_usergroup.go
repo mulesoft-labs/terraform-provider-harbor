@@ -11,8 +11,8 @@ import (
 	"github.com/sandhose/terraform-provider-harbor/api/client/products"
 	apimodels "github.com/sandhose/terraform-provider-harbor/api/models"
 
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func resourceHarborUserGroup() *schema.Resource {
