@@ -3,6 +3,7 @@ GOFMT_FILES?=$$(find . -name '*.go')
 WEBSITE_REPO=github.com/sandhose/terraform-provider-harbor
 PKG_NAME=harbor
 VERSION=$(shell git describe --tags --always)
+TEST_COUNT?=1
 
 default: build
 
@@ -10,9 +11,10 @@ build: fmtcheck # errcheck
 	go install -ldflags="-X github.com/terraform-providers/terraform-provider-harbor/version.ProviderVersion=$(VERSION)"
 
 test: fmtcheck
-	go test -i $(TEST) || exit 1
-	echo $(TEST) | \
-		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
+	go test $(TEST) $(TESTARGS) -v -timeout 120s -parallel 4
+
+testacc: fmtcheck
+	TF_ACC=1 go test $(TEST) $(TESTARGS) -v -timeout 120m -parallel 20 -count $(TEST_COUNT)
 
 vet:
 	@echo "go vet ."
@@ -24,7 +26,8 @@ vet:
 	fi
 
 fmt:
-	gofmt -w $(GOFMT_FILES)
+	@echo "==> Fixing source code with gofmt..."
+	gofmt -s -w $(GOFMT_FILES)
 
 fmtcheck:
 	@sh -c "'$(CURDIR)/scripts/gofmtcheck.sh'"
@@ -40,12 +43,29 @@ test-compile:
 	fi
 	go test -c $(TEST) $(TESTARGS)
 
+lint:
+	@echo "==> Checking source code against linters..."
+	@golangci-lint run ./$(PKG_NAME)/...
+
+tools:
+	go install github.com/bflad/tfproviderdocs
+	go install github.com/client9/misspell/cmd/misspell
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint
+
+websitefmtcheck:
+	@sh -c "'$(CURDIR)/scripts/websitefmtcheck.sh'"
+
 website:
 ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
 	echo "$(WEBSITE_REPO) not found in your GOPATH (necessary for layouts and assets), get-ting..."
 	git clone https://$(WEBSITE_REPO) $(GOPATH)/src/$(WEBSITE_REPO)
 endif
 	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
+
+website-lint:
+	@echo "==> Checking website against linters..."
+	@misspell -error -source=text website/
+	@docker run -v $(PWD):/markdown 06kellyjac/markdownlint-cli website/docs/
 
 website-test:
 ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
@@ -54,4 +74,4 @@ ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
 endif
 	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider-test PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
 
-.PHONY: build test vet fmt fmtcheck errcheck test-compile website website-test
+.PHONY: build test testacc vet fmt fmtcheck errcheck test-compile lint tools websitefmtcheck website website-lint website-test
