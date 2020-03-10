@@ -8,11 +8,9 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	apiclient "github.com/sandhose/terraform-provider-harbor/api/client"
 
+	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/hashicorp/terraform/helper/acctest"
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/terraform"
 )
 
 var (
