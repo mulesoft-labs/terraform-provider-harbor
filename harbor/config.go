@@ -14,9 +14,10 @@ import (
 )
 
 type Config struct {
-	Host     string
-	Username string
-	Password string
+	Host             string
+	Username         string
+	Password         string
+	terraformVersion string
 }
 
 type transport struct {
@@ -48,6 +49,7 @@ func (c *Config) Config() (*apiclient.Harbor, error) {
 	cli.Transport = logging.NewTransport("Harbor", cli.Transport)
 
 	runtime := httptransport.NewWithClient(cfg.Host, cfg.BasePath, cfg.Schemes, cli)
+	// TODO(burdz): support other methods of Authentication given the auth_mode <10-03-20> //
 	auth := httptransport.BasicAuth(c.Username, c.Password)
 	runtime.DefaultAuthentication = auth
 	client := apiclient.New(runtime, strfmt.Default)

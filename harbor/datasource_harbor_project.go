@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
+// TODO(burdz): update schema to include current_user_role_ids, cve_whitelist & metadata <10-03-20> //
 func dataSourceHarborProject() *schema.Resource {
 	return &schema.Resource{
 		Read: dataSourceHarborProjectRead,

@@ -13,10 +13,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
+// TODO(burdz): update schema to include current_user_role_ids, cve_whitelist & metadata <10-03-20> //
 func resourceHarborProject() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceHarborProjectCreate,
 		Read:   resourceHarborProjectRead,
+		// TODO(burdz): fix below --v err = All fields are ForceNew or Computed w/out Optional <10-03-20> //
 		// Update: resourceHarborProjectUpdate,
 		Delete: resourceHarborProjectDelete,
 		Importer: &schema.ResourceImporter{
@@ -70,11 +72,13 @@ func resourceHarborProjectCreate(d *schema.ResourceData, meta interface{}) error
 	client := meta.(*apiclient.Harbor)
 	name := d.Get("name").(string)
 
+	projectParams := &apimodels.ProjectReq{
+		ProjectName: name,
+	}
+
 	_, err := client.Products.PostProjects(
 		products.NewPostProjectsParamsWithContext(context.TODO()).
-			WithProject(&apimodels.ProjectReq{
-				ProjectName: name,
-			}),
+			WithProject(projectParams),
 		nil,
 	)
 
@@ -133,15 +137,34 @@ func resourceHarborProjectRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-// func resourceHarborProjectUpdate(d *schema.ResourceData, meta interface{}) error {
-// 	return nil
-// }
+func resourceHarborProjectUpdate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*apiclient.Harbor)
+
+	projectID, err := strconv.ParseInt(d.Id(), 10, 64)
+	if err != nil {
+		return err
+	}
+
+	// TODO(burdz):	pass mutable project parameters <10-03-20> //
+	projectParams := &apimodels.ProjectReq{}
+
+	_, err = client.Products.PutProjectsProjectID(
+		products.NewPutProjectsProjectIDParamsWithContext(context.TODO()).
+			WithProjectID(projectID).
+			WithProject(projectParams),
+		nil,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func resourceHarborProjectDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*apiclient.Harbor)
 
 	projectID, err := strconv.ParseInt(d.Id(), 10, 64)
-
 	if err != nil {
 		return err
 	}

@@ -57,7 +57,7 @@ func TestProviderParameters(t *testing.T) {
 		t.Fatalf("Expected %s, got %s", raw["host"], transport.Host)
 	}
 
-	// TODO: test basic auth
+	// TODO(burdz): test basic auth <10-03-20> //
 }
 
 func testAccPreCheck(t *testing.T) {
