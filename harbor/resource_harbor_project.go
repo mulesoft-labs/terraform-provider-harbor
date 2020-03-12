@@ -13,13 +13,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
-// TODO(burdz): update schema to include current_user_role_ids, cve_whitelist & metadata <10-03-20> //
+// TODO(burdz): update schema to include current_user_role_ids, cve_whitelist <10-03-20> //
 func resourceHarborProject() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceHarborProjectCreate,
 		Read:   resourceHarborProjectRead,
-		// TODO(burdz): fix below --v err = All fields are ForceNew or Computed w/out Optional <10-03-20> //
-		// Update: resourceHarborProjectUpdate,
+		Update: resourceHarborProjectUpdate,
 		Delete: resourceHarborProjectDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
@@ -29,6 +28,36 @@ func resourceHarborProject() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
+			},
+			"public": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"auto_scan": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"content_trust": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"prevent_vulnerability": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"severity": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  "low",
+			},
+			"reuse_sys_cve_whitelist": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
 			},
 
 			// computed
@@ -74,6 +103,14 @@ func resourceHarborProjectCreate(d *schema.ResourceData, meta interface{}) error
 
 	projectParams := &apimodels.ProjectReq{
 		ProjectName: name,
+		Metadata: &apimodels.ProjectMetadata{
+			Public:               strconv.FormatBool(d.Get("public").(bool)),
+			AutoScan:             strconv.FormatBool(d.Get("auto_scan").(bool)),
+			PreventVul:           strconv.FormatBool(d.Get("prevent_vulnerability").(bool)),
+			Severity:             d.Get("severity").(string),
+			EnableContentTrust:   strconv.FormatBool(d.Get("content_trust").(bool)),
+			ReuseSysCveWhitelist: strconv.FormatBool(d.Get("content_trust").(bool)),
+		},
 	}
 
 	_, err := client.Products.PostProjects(
@@ -98,7 +135,7 @@ func resourceHarborProjectCreate(d *schema.ResourceData, meta interface{}) error
 
 	var project *apimodels.Project
 	for _, p := range resp.Payload {
-		if strings.ToLower(p.Name) == strings.ToLower(name) {
+		if strings.EqualFold(p.Name, name) {
 			project = p
 			break
 		}
@@ -145,8 +182,16 @@ func resourceHarborProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 
-	// TODO(burdz):	pass mutable project parameters <10-03-20> //
-	projectParams := &apimodels.ProjectReq{}
+	projectParams := &apimodels.ProjectReq{
+		Metadata: &apimodels.ProjectMetadata{
+			Public:               strconv.FormatBool(d.Get("public").(bool)),
+			AutoScan:             strconv.FormatBool(d.Get("auto_scan").(bool)),
+			PreventVul:           strconv.FormatBool(d.Get("prevent_vulnerability").(bool)),
+			Severity:             d.Get("severity").(string),
+			EnableContentTrust:   strconv.FormatBool(d.Get("content_trust").(bool)),
+			ReuseSysCveWhitelist: strconv.FormatBool(d.Get("content_trust").(bool)),
+		},
+	}
 
 	_, err = client.Products.PutProjectsProjectID(
 		products.NewPutProjectsProjectIDParamsWithContext(context.TODO()).
@@ -185,13 +230,30 @@ func resourceHarborProjectDelete(d *schema.ResourceData, meta interface{}) error
 func harborProjectUpdate(d *schema.ResourceData, p *apimodels.Project) {
 	d.SetId(fmt.Sprint(p.ProjectID))
 
-	d.Set("project_id", p.ProjectID)
-	d.Set("name", p.Name)
-	d.Set("owner_id", p.OwnerID)
-	d.Set("owner_name", p.OwnerName)
-	d.Set("creation_time", p.CreationTime)
-	d.Set("update_time", p.UpdateTime)
-	d.Set("deleted", p.Deleted)
-	d.Set("repo_count", p.RepoCount)
-	d.Set("chart_count", p.ChartCount)
+	attributes := map[string]interface{}{
+		"project_id":              p.ProjectID,
+		"name":                    p.Name,
+		"public":                  p.Metadata.Public,
+		"auto_scan":               p.Metadata.AutoScan,
+		"prevent_vulnerability":   p.Metadata.PreventVul,
+		"severity":                p.Metadata.Severity,
+		"content_trust":           p.Metadata.EnableContentTrust,
+		"reuse_sys_cve_whitelist": p.Metadata.ReuseSysCveWhitelist,
+		"owner_id":                p.OwnerID,
+		"owner_name":              p.OwnerName,
+		"creation_time":           p.CreationTime,
+		"update_time":             p.UpdateTime,
+		"deleted":                 p.Deleted,
+		"repo_count":              p.RepoCount,
+		"chart_count":             p.ChartCount,
+	}
+
+	for key, val := range attributes {
+		d.Set(key, val)
+		// TODO(burdz): return error <12-03-20> //
+		// err = d.Set(key, val)
+		// if err != nil {
+		// 	return err
+		// }
+	}
 }

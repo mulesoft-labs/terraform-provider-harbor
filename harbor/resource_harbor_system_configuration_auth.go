@@ -42,6 +42,10 @@ func resourceHarborConfigAuth() *schema.Resource {
 				Optional:  true,
 				Sensitive: true,
 			},
+			// "oidc_groups_claim": {
+			// 	Type:     schema.TypeString,
+			// 	Optional: true,
+			// },
 			"oidc_scope": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -141,10 +145,10 @@ func harborConfigAuthGet(d *schema.ResourceData) *apimodels.Configurations {
 		OidcEndpoint:     d.Get("oidc_endpoint").(string),
 		OidcClientID:     d.Get("oidc_client_id").(string),
 		OidcClientSecret: d.Get("oidc_client_secret").(string),
-		OidcScope:        d.Get("oidc_scope").(string),
-		OidcVerifyCert:   d.Get("oidc_verify_cert").(bool),
+		// OidcGroupsClaim:  d.Set("oidc_groups_claim").(string),
+		OidcScope:      d.Get("oidc_scope").(string),
+		OidcVerifyCert: d.Get("oidc_verify_cert").(bool),
 	}
-
 }
 
 func harborConfigAuthUpdate(d *schema.ResourceData, c *apimodels.ConfigurationsResponse) {
@@ -154,6 +158,7 @@ func harborConfigAuthUpdate(d *schema.ResourceData, c *apimodels.ConfigurationsR
 	d.Set("oidc_name", c.OidcName)
 	d.Set("oidc_endpoint", c.OidcEndpoint)
 	d.Set("oidc_client_id", c.OidcClientID)
+	// d.Set("oidc_groups_claim", c.OidcClientID)
 	d.Set("oidc_scope", c.OidcScope)
 	d.Set("oidc_verify_cert", c.OidcVerifyCert)
 }
