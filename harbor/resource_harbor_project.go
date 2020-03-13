@@ -145,7 +145,10 @@ func resourceHarborProjectCreate(d *schema.ResourceData, meta interface{}) error
 		return fmt.Errorf("Project not found")
 	}
 
-	harborProjectUpdate(d, project)
+	err = harborProjectUpdate(d, project)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -169,7 +172,10 @@ func resourceHarborProjectRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	harborProjectUpdate(d, resp.Payload)
+	err = harborProjectUpdate(d, resp.Payload)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -227,7 +233,7 @@ func resourceHarborProjectDelete(d *schema.ResourceData, meta interface{}) error
 	return nil
 }
 
-func harborProjectUpdate(d *schema.ResourceData, p *apimodels.Project) {
+func harborProjectUpdate(d *schema.ResourceData, p *apimodels.Project) error {
 	d.SetId(fmt.Sprint(p.ProjectID))
 
 	attributes := map[string]interface{}{
@@ -248,12 +254,12 @@ func harborProjectUpdate(d *schema.ResourceData, p *apimodels.Project) {
 		"chart_count":             p.ChartCount,
 	}
 
+	var err error
 	for key, val := range attributes {
-		d.Set(key, val)
-		// TODO(burdz): return error <12-03-20> //
-		// err = d.Set(key, val)
-		// if err != nil {
-		// 	return err
-		// }
+		err = d.Set(key, val)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }

@@ -16,7 +16,7 @@ func resourceHarborConfigAuth() *schema.Resource {
 		Create: resourceHarborConfigAuthCreate,
 		Read:   resourceHarborConfigAuthRead,
 		Update: resourceHarborConfigAuthUpdate,
-		// Delete: resourceHarborConfigAuthDelete,
+		Delete: resourceHarborConfigAuthDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -83,7 +83,10 @@ func resourceHarborConfigAuthCreate(d *schema.ResourceData, meta interface{}) er
 		return fmt.Errorf("auth_mode not set correctly")
 	}
 
-	harborConfigAuthUpdate(d, resp.Payload)
+	err = harborConfigAuthUpdate(d, resp.Payload)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -99,7 +102,10 @@ func resourceHarborConfigAuthRead(d *schema.ResourceData, meta interface{}) erro
 		return err
 	}
 
-	harborConfigAuthUpdate(d, resp.Payload)
+	err = harborConfigAuthUpdate(d, resp.Payload)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -129,7 +135,10 @@ func resourceHarborConfigAuthUpdate(d *schema.ResourceData, meta interface{}) er
 		return fmt.Errorf("auth_mode not set correctly")
 	}
 
-	harborConfigAuthUpdate(d, resp.Payload)
+	err = harborConfigAuthUpdate(d, resp.Payload)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -151,14 +160,25 @@ func harborConfigAuthGet(d *schema.ResourceData) *apimodels.Configurations {
 	}
 }
 
-func harborConfigAuthUpdate(d *schema.ResourceData, c *apimodels.ConfigurationsResponse) {
+func harborConfigAuthUpdate(d *schema.ResourceData, c *apimodels.ConfigurationsResponse) error {
 	d.SetId(fmt.Sprint(c.AuthMode))
 
-	d.Set("auth_mode", c.AuthMode)
-	d.Set("oidc_name", c.OidcName)
-	d.Set("oidc_endpoint", c.OidcEndpoint)
-	d.Set("oidc_client_id", c.OidcClientID)
-	// d.Set("oidc_groups_claim", c.OidcClientID)
-	d.Set("oidc_scope", c.OidcScope)
-	d.Set("oidc_verify_cert", c.OidcVerifyCert)
+	attributes := map[string]interface{}{
+		"auth_mode":      c.AuthMode,
+		"oidc_name":      c.OidcName,
+		"oidc_endpoint":  c.OidcEndpoint,
+		"oidc_client_id": c.OidcClientID,
+		// "oidc_groups_claim": c.OidcClientID,
+		"oidc_scope":       c.OidcScope,
+		"oidc_verify_cert": c.OidcVerifyCert,
+	}
+
+	var err error
+	for key, val := range attributes {
+		err = d.Set(key, val)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

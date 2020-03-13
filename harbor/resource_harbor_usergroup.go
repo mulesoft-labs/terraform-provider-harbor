@@ -94,7 +94,10 @@ func resourceHarborUserGroupCreate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("User group not found")
 	}
 
-	harborUserGroupUpdate(d, usergroup)
+	err = harborUserGroupUpdate(d, usergroup)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -117,7 +120,10 @@ func resourceHarborUserGroupRead(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 
-	harborUserGroupUpdate(d, resp.Payload)
+	err = harborUserGroupUpdate(d, resp.Payload)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -169,11 +175,22 @@ func resourceHarborUserGroupDelete(d *schema.ResourceData, meta interface{}) err
 	return nil
 }
 
-func harborUserGroupUpdate(d *schema.ResourceData, u *apimodels.UserGroup) {
+func harborUserGroupUpdate(d *schema.ResourceData, u *apimodels.UserGroup) error {
 	d.SetId(fmt.Sprint(u.ID))
 
-	d.Set("group_id", u.ID)
-	d.Set("name", u.GroupName)
-	d.Set("type", u.GroupType)
-	d.Set("ldap_group_dn", u.LdapGroupDn)
+	attributes := map[string]interface{}{
+		"group_id":      u.ID,
+		"name":          u.GroupName,
+		"type":          u.GroupType,
+		"ldap_group_dn": u.LdapGroupDn,
+	}
+
+	var err error
+	for key, val := range attributes {
+		err = d.Set(key, val)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

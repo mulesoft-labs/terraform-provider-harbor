@@ -7,7 +7,7 @@ TEST_COUNT?=1
 
 default: build
 
-build: fmtcheck # errcheck
+build: fmtcheck errcheck
 	go install -ldflags="-X github.com/terraform-providers/terraform-provider-harbor/version.ProviderVersion=$(VERSION)"
 
 test: fmtcheck

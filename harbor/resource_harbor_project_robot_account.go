@@ -120,8 +120,16 @@ func resourceHarborProjectRobotAccountCreate(d *schema.ResourceData, meta interf
 		return err
 	}
 
-	d.Set("username", resp.Payload.Name)
-	d.Set("token", resp.Payload.Token)
+	credentials := map[string]interface{}{
+		"username": resp.Payload.Name,
+		"token":    resp.Payload.Token,
+	}
+	for key, val := range credentials {
+		err = d.Set(key, val)
+		if err != nil {
+			return err
+		}
+	}
 
 	listResp, err := client.Products.GetProjectsProjectIDRobots(
 		products.NewGetProjectsProjectIDRobotsParamsWithContext(context.TODO()).
@@ -146,19 +154,12 @@ func resourceHarborProjectRobotAccountCreate(d *schema.ResourceData, meta interf
 		return fmt.Errorf("could not found robot %s", resp.Payload.Name)
 	}
 
-	resourceHarborProjectRobotAccountRefresh(d, foundRobot)
+	err = resourceHarborProjectRobotAccountRefresh(d, foundRobot)
+	if err != nil {
+		return err
+	}
 
 	return nil
-}
-
-func resourceHarborProjectRobotAccountRefresh(d *schema.ResourceData, r *apimodels.RobotAccount) {
-	d.SetId(fmt.Sprintf("%d/%d", r.ProjectID, r.ID))
-	d.Set("description", r.Description)
-	d.Set("username", r.Name)
-	d.Set("creation_time", r.CreationTime)
-	d.Set("update_time", r.UpdateTime)
-	d.Set("project_id", r.ProjectID)
-	d.Set("disabled", r.Disabled)
 }
 
 func resourceHarborProjectRobotAccountParseID(id string) (int64, int64, error) {
@@ -199,7 +200,10 @@ func resourceHarborProjectRobotAccountRead(d *schema.ResourceData, meta interfac
 		return err
 	}
 
-	resourceHarborProjectRobotAccountRefresh(d, resp.Payload)
+	err = resourceHarborProjectRobotAccountRefresh(d, resp.Payload)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -250,5 +254,27 @@ func resourceHarborProjectRobotAccountDelete(d *schema.ResourceData, meta interf
 		return err
 	}
 
+	return nil
+}
+
+func resourceHarborProjectRobotAccountRefresh(d *schema.ResourceData, r *apimodels.RobotAccount) error {
+	d.SetId(fmt.Sprintf("%d/%d", r.ProjectID, r.ID))
+
+	attributes := map[string]interface{}{
+		"description":   r.Description,
+		"username":      r.Name,
+		"creation_time": r.CreationTime,
+		"update_time":   r.UpdateTime,
+		"project_id":    r.ProjectID,
+		"disabled":      r.Disabled,
+	}
+
+	var err error
+	for key, val := range attributes {
+		err = d.Set(key, val)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
