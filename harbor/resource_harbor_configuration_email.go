@@ -74,7 +74,10 @@ func resourceHarborConfigEmailCreate(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 
-	harborConfigEmailUpdate(d, resp.Payload)
+	err = harborConfigEmailUpdate(d, resp.Payload)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -90,7 +93,10 @@ func resourceHarborConfigEmailRead(d *schema.ResourceData, meta interface{}) err
 		return err
 	}
 
-	harborConfigEmailUpdate(d, resp.Payload)
+	err = harborConfigEmailUpdate(d, resp.Payload)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -115,7 +121,10 @@ func resourceHarborConfigEmailUpdate(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 
-	harborConfigEmailUpdate(d, resp.Payload)
+	err = harborConfigEmailUpdate(d, resp.Payload)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -136,7 +145,7 @@ func harborConfigEmailGet(d *schema.ResourceData) *apimodels.Configurations {
 	}
 }
 
-func harborConfigEmailUpdate(d *schema.ResourceData, c *apimodels.ConfigurationsResponse) {
+func harborConfigEmailUpdate(d *schema.ResourceData, c *apimodels.ConfigurationsResponse) error {
 	// TODO(burdz): unique ID <10-03-20> //
 	d.SetId("harboremail")
 
@@ -150,12 +159,12 @@ func harborConfigEmailUpdate(d *schema.ResourceData, c *apimodels.Configurations
 		"email_verify_cert": c.EmailInsecure,
 	}
 
+	var err error
 	for key, val := range attributes {
-		d.Set(key, val)
-		// TODO(burdz): return error <12-03-20> //
-		// err = d.Set(key, val)
-		// if err != nil {
-		// 	return err
-		// }
+		err = d.Set(key, val)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }

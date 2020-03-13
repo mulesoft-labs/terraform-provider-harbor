@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	strfmt "github.com/go-openapi/strfmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/logging"
@@ -36,10 +35,11 @@ func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	return resp, nil
 }
 
-type CombinedConfig struct {
-	client *apiclient.Harbor
-	auth   runtime.ClientAuthInfoWriter
-}
+// TODO(burdz): see if there is a future need for this? <12-03-20> //
+// type CombinedConfig struct {
+// 	client *apiclient.Harbor
+// 	auth   runtime.ClientAuthInfoWriter
+// }
 
 func (c *Config) Config() (*apiclient.Harbor, error) {
 	cfg := apiclient.DefaultTransportConfig().

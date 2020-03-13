@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/bflad/tfproviderdocs v0.5.0 // indirect
 	github.com/bflad/tfproviderlint v0.11.0 // indirect
+	github.com/coreos/etcd v3.3.10+incompatible
 	github.com/go-openapi/errors v0.19.4
 	github.com/go-openapi/runtime v0.19.12
 	github.com/go-openapi/strfmt v0.19.5

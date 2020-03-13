@@ -117,7 +117,10 @@ func dataSourceHarborProjectRead(d *schema.ResourceData, meta interface{}) error
 		return fmt.Errorf("Project not found")
 	}
 
-	harborProjectUpdate(d, project)
+	err := harborProjectUpdate(d, project)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

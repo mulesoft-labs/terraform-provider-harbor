@@ -28,11 +28,11 @@ func Provider() terraform.ResourceProvider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"harbor_project":                    resourceHarborProject(),
-			"harbor_project_robot_account":      resourceHarborProjectRobotAccount(),
-			"harbor_usergroup":                  resourceHarborUserGroup(),
-			"harbor_system_configuration_auth":  resourceHarborConfigAuth(),
-			"harbor_system_configuration_email": resourceHarborConfigEmail(),
+			"harbor_project":               resourceHarborProject(),
+			"harbor_project_robot_account": resourceHarborProjectRobotAccount(),
+			"harbor_usergroup":             resourceHarborUserGroup(),
+			"harbor_configuration_auth":    resourceHarborConfigAuth(),
+			"harbor_configuration_email":   resourceHarborConfigEmail(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"harbor_system_info": dataSourceHarborSystemInfo(),

@@ -94,18 +94,27 @@ func dataSourceHarborSystemInfoRead(d *schema.ResourceData, meta interface{}) er
 
 	// TODO(burdz): unique ID <10-03-20> //
 	d.SetId("systeminfo")
-	d.Set("admiral_endpoint", i.AdmiralEndpoint)
-	d.Set("auth_mode", i.AuthMode)
-	d.Set("external_url", i.ExternalURL)
-	d.Set("harbor_version", i.HarborVersion)
-	d.Set("has_ca_root", i.HasCaRoot)
-	d.Set("next_scan_all", i.NextScanAll)
-	d.Set("project_creation_restriction", i.ProjectCreationRestriction)
-	d.Set("registry_url", i.RegistryURL)
-	d.Set("self_registration", i.SelfRegistration)
-	d.Set("with_admiral", i.WithAdmiral)
-	d.Set("with_clair", i.WithClair)
-	d.Set("with_notary", i.WithNotary)
+	attributes := map[string]interface{}{
+		"admiral_endpoint":             i.AdmiralEndpoint,
+		"auth_mode":                    i.AuthMode,
+		"external_url":                 i.ExternalURL,
+		"harbor_version":               i.HarborVersion,
+		"has_ca_root":                  i.HasCaRoot,
+		"next_scan_all":                i.NextScanAll,
+		"project_creation_restriction": i.ProjectCreationRestriction,
+		"registry_url":                 i.RegistryURL,
+		"self_registration":            i.SelfRegistration,
+		"with_admiral":                 i.WithAdmiral,
+		"with_clair":                   i.WithClair,
+		"with_notary":                  i.WithNotary,
+	}
+
+	for key, val := range attributes {
+		err = d.Set(key, val)
+		if err != nil {
+			return err
+		}
+	}
 
 	clairVulnerabilityStatus, err := flattenClairVulnerabilityStatus(i.ClairVulnerabilityStatus, d)
 	if err != nil {

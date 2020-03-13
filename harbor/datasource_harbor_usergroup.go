@@ -94,7 +94,10 @@ func dataSourceHarborUserGroupRead(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Harbor User Group not found")
 	}
 
-	harborUserGroupUpdate(d, usergroup)
+	err := harborUserGroupUpdate(d, usergroup)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
