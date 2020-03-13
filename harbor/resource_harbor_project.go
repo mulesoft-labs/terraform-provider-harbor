@@ -167,7 +167,6 @@ func resourceHarborProjectRead(d *schema.ResourceData, meta interface{}) error {
 			WithProjectID(projectID),
 		nil,
 	)
-
 	if err != nil {
 		return err
 	}
@@ -205,6 +204,20 @@ func resourceHarborProjectUpdate(d *schema.ResourceData, meta interface{}) error
 			WithProject(projectParams),
 		nil,
 	)
+	if err != nil {
+		return err
+	}
+
+	resp, err := client.Products.GetProjectsProjectID(
+		products.NewGetProjectsProjectIDParamsWithContext(context.TODO()).
+			WithProjectID(projectID),
+		nil,
+	)
+	if err != nil {
+		return err
+	}
+
+	err = harborProjectUpdate(d, resp.Payload)
 	if err != nil {
 		return err
 	}

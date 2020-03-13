@@ -162,25 +162,6 @@ func resourceHarborProjectRobotAccountCreate(d *schema.ResourceData, meta interf
 	return nil
 }
 
-func resourceHarborProjectRobotAccountParseID(id string) (int64, int64, error) {
-	parts := strings.Split(id, "/")
-	if len(parts) != 2 {
-		return 0, 0, fmt.Errorf("invalid id %s", id)
-	}
-
-	projectID, err := strconv.Atoi(parts[0])
-	if err != nil {
-		return 0, 0, err
-	}
-
-	robotID, err := strconv.Atoi(parts[1])
-	if err != nil {
-		return 0, 0, err
-	}
-
-	return int64(projectID), int64(robotID), nil
-}
-
 func resourceHarborProjectRobotAccountRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*apiclient.Harbor)
 
@@ -232,6 +213,22 @@ func resourceHarborProjectRobotAccountUpdate(d *schema.ResourceData, meta interf
 		return err
 	}
 
+	resp, err := client.Products.GetProjectsProjectIDRobotsRobotID(
+		products.NewGetProjectsProjectIDRobotsRobotIDParamsWithContext(context.TODO()).
+			WithProjectID(projectID).
+			WithRobotID(robotID),
+		nil,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	err = resourceHarborProjectRobotAccountRefresh(d, resp.Payload)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -255,6 +252,25 @@ func resourceHarborProjectRobotAccountDelete(d *schema.ResourceData, meta interf
 	}
 
 	return nil
+}
+
+func resourceHarborProjectRobotAccountParseID(id string) (int64, int64, error) {
+	parts := strings.Split(id, "/")
+	if len(parts) != 2 {
+		return 0, 0, fmt.Errorf("invalid id %s", id)
+	}
+
+	projectID, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return 0, 0, err
+	}
+
+	robotID, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return int64(projectID), int64(robotID), nil
 }
 
 func resourceHarborProjectRobotAccountRefresh(d *schema.ResourceData, r *apimodels.RobotAccount) error {

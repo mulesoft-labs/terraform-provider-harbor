@@ -151,6 +151,20 @@ func resourceHarborUserGroupUpdate(d *schema.ResourceData, meta interface{}) err
 		return err
 	}
 
+	resp, err := client.Products.GetUsergroupsGroupID(
+		products.NewGetUsergroupsGroupIDParamsWithContext(context.TODO()).
+			WithGroupID(usergroupID),
+		nil,
+	)
+	if err != nil {
+		log.Printf("[DEBUG] User group loading failed")
+		return err
+	}
+	err = harborUserGroupUpdate(d, resp.Payload)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
