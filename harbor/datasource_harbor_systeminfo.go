@@ -63,7 +63,7 @@ func dataSourceHarborSystemInfo() *schema.Resource {
 				Computed: true,
 			},
 			"clair_vulnerability_status": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeMap,
 				Computed: true,
 				MaxItems: 1,
 				Elem: &schema.Resource{
@@ -72,10 +72,22 @@ func dataSourceHarborSystemInfo() *schema.Resource {
 							Type:     schema.TypeInt,
 							Computed: true,
 						},
-						// "details": {
-						// 	Type:     schema.TypeInt,
-						// 	Computed: true,
-						// },
+						"details": {
+							Type:     schema.TypeSet,
+							Computed: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"last_update": {
+										Type:     schema.TypeInt,
+										Computed: true,
+									},
+									"namespace": {
+										Type:     schema.TypeString,
+										Computed: true,
+									},
+								},
+							},
+						},
 					},
 				},
 			},
@@ -137,5 +149,30 @@ func flattenClairVulnerabilityStatus(i *models.GeneralInfoClairVulnerabilityStat
 	clairStatus := make(map[string]interface{})
 
 	clairStatus["overall_last_update"] = i.OverallLastUpdate
+
+	var err error
+	clairStatus["details"], err = flattenClairVulnerabilityDetails(i.Details, d)
+	if err != nil {
+		return clairStatus, err
+	}
+
 	return clairStatus, nil
+}
+
+func flattenClairVulnerabilityDetails(vulnDetails []*models.VulnNamespaceTimestamp, d *schema.ResourceData) ([]map[string]interface{}, error) {
+	if vulnDetails == nil {
+		return nil, nil
+	}
+
+	var details = make([]map[string]interface{}, len(vulnDetails))
+	for i, v := range vulnDetails {
+		m := make(map[string]interface{})
+
+		m["namespace"] = v.Namespace
+		m["last_update"] = v.LastUpdate
+
+		details[i] = m
+	}
+
+	return details, nil
 }
