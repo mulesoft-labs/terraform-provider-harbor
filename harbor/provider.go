@@ -33,6 +33,7 @@ func Provider() terraform.ResourceProvider {
 			"harbor_usergroup":             resourceHarborUserGroup(),
 			"harbor_configuration_auth":    resourceHarborConfigAuth(),
 			"harbor_configuration_email":   resourceHarborConfigEmail(),
+			"harbor_configuration_system":  resourceHarborConfigSystem(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"harbor_system_info": dataSourceHarborSystemInfo(),
