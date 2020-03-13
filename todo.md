@@ -10,8 +10,10 @@
 - [ ] `harbor_replication_policy`
 - [ ] `harbor_registry`
 - [x] `harbor_usergroup`
-- [ ] `harbor_system_configuration`
-- [x] `harbor_system_configuration_auth`
+- [x] `harbor_configuration_system`
+- [x] `harbor_configuration_email`
+- [x] `harbor_configuration_auth`
+- [ ] `harbor_configuration_vulnerability`
   - > TODO(burdz): harbor_system_configuration_auth requires tests <12-03-20> >
 - [ ] `harbor_registry`
 - [ ] `harbor_project_quotas`
@@ -26,8 +28,10 @@
 - [ ] `harbor_replication_policy`
 - [ ] `harbor_registry`
 - [x] `harbor_usergroup`
-- [ ] `harbor_system_configuration`
-- [ ] `harbor_system_configuration_auth`
+- [ ] `harbor_configuration_system`
+- [ ] `harbor_configuration_email`
+- [ ] `harbor_configuration_auth`
+- [ ] `harbor_configuration_vulnerability`
 - [ ] `harbor_registry`
 - [ ] `harbor_project_quotas`
 - [x] `harbor_systeminfo`
@@ -38,3 +42,4 @@
 <!-- project quotas -->
 <!-- garbage collection -->
 <!-- project tag retention, immutability, webhooks, scanner, config -->
+
