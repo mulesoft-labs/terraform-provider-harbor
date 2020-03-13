@@ -72,7 +72,7 @@ func dataSourceHarborUserGroupRead(d *schema.ResourceData, meta interface{}) err
 		}
 
 		for _, p := range resp.Payload {
-			if strings.ToLower(p.GroupName) == strings.ToLower(usergroupName) {
+			if strings.EqualFold(p.GroupName, usergroupName) {
 				usergroup = p
 				break
 			}

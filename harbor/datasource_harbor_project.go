@@ -94,7 +94,7 @@ func dataSourceHarborProjectRead(d *schema.ResourceData, meta interface{}) error
 		}
 
 		for _, p := range resp.Payload {
-			if strings.ToLower(p.Name) == strings.ToLower(projectName) {
+			if strings.EqualFold(p.Name, projectName) {
 				project = p
 				break
 			}

@@ -84,7 +84,7 @@ func resourceHarborUserGroupCreate(d *schema.ResourceData, meta interface{}) err
 
 	var usergroup *apimodels.UserGroup
 	for _, p := range resp.Payload {
-		if strings.ToLower(p.GroupName) == strings.ToLower(userGroupParams.GroupName) {
+		if strings.EqualFold(p.GroupName, userGroupParams.GroupName) {
 			usergroup = p
 			break
 		}
