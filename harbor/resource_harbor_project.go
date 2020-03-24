@@ -164,7 +164,6 @@ func resourceHarborProjectRead(d *schema.ResourceData, meta interface{}) error {
 			WithProjectID(projectID),
 		nil,
 	)
-
 	if err != nil {
 		return err
 	}
