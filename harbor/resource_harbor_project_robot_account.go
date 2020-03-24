@@ -114,7 +114,6 @@ func resourceHarborProjectRobotAccountCreate(d *schema.ResourceData, meta interf
 			WithRobot(&robotAccountCreate),
 		nil,
 	)
-
 	if err != nil {
 		log.Printf("[DEBUG] Robot account creation failed")
 		return err
@@ -136,7 +135,6 @@ func resourceHarborProjectRobotAccountCreate(d *schema.ResourceData, meta interf
 			WithProjectID(projectID),
 		nil,
 	)
-
 	if err != nil {
 		log.Printf("[DEBUG] Robot account loading failed")
 		return err
@@ -149,104 +147,11 @@ func resourceHarborProjectRobotAccountCreate(d *schema.ResourceData, meta interf
 			break
 		}
 	}
-
 	if foundRobot == nil {
 		return fmt.Errorf("could not found robot %s", resp.Payload.Name)
 	}
 
-	err = resourceHarborProjectRobotAccountRefresh(d, foundRobot)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func resourceHarborProjectRobotAccountRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*apiclient.Harbor)
-
-	projectID, robotID, err := resourceHarborProjectRobotAccountParseID(d.Id())
-	if err != nil {
-		return err
-	}
-
-	resp, err := client.Products.GetProjectsProjectIDRobotsRobotID(
-		products.NewGetProjectsProjectIDRobotsRobotIDParamsWithContext(context.TODO()).
-			WithProjectID(projectID).
-			WithRobotID(robotID),
-		nil,
-	)
-
-	if err != nil {
-		return err
-	}
-
-	err = resourceHarborProjectRobotAccountRefresh(d, resp.Payload)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func resourceHarborProjectRobotAccountUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*apiclient.Harbor)
-
-	projectID, robotID, err := resourceHarborProjectRobotAccountParseID(d.Id())
-	if err != nil {
-		return err
-	}
-
-	disabled := d.Get("disabled").(bool)
-
-	_, err = client.Products.PutProjectsProjectIDRobotsRobotID(
-		products.NewPutProjectsProjectIDRobotsRobotIDParamsWithContext(context.TODO()).
-			WithProjectID(projectID).
-			WithRobotID(robotID).
-			WithRobot(&apimodels.RobotAccountUpdate{
-				Disabled: disabled,
-			}),
-		nil,
-	)
-
-	if err != nil {
-		return err
-	}
-
-	resp, err := client.Products.GetProjectsProjectIDRobotsRobotID(
-		products.NewGetProjectsProjectIDRobotsRobotIDParamsWithContext(context.TODO()).
-			WithProjectID(projectID).
-			WithRobotID(robotID),
-		nil,
-	)
-
-	if err != nil {
-		return err
-	}
-
-	err = resourceHarborProjectRobotAccountRefresh(d, resp.Payload)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func resourceHarborProjectRobotAccountDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*apiclient.Harbor)
-
-	projectID, robotID, err := resourceHarborProjectRobotAccountParseID(d.Id())
-	if err != nil {
-		return err
-	}
-
-	_, err = client.Products.DeleteProjectsProjectIDRobotsRobotID(
-		products.NewDeleteProjectsProjectIDRobotsRobotIDParamsWithContext(context.TODO()).
-			WithProjectID(projectID).
-			WithRobotID(robotID),
-		nil,
-	)
-
+	err = harborProjectRobotAccountUpdate(d, foundRobot)
 	if err != nil {
 		return err
 	}
@@ -273,7 +178,75 @@ func resourceHarborProjectRobotAccountParseID(id string) (int64, int64, error) {
 	return int64(projectID), int64(robotID), nil
 }
 
-func resourceHarborProjectRobotAccountRefresh(d *schema.ResourceData, r *apimodels.RobotAccount) error {
+func resourceHarborProjectRobotAccountRead(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*apiclient.Harbor)
+
+	projectID, robotID, err := resourceHarborProjectRobotAccountParseID(d.Id())
+	if err != nil {
+		return err
+	}
+
+	resp, err := client.Products.GetProjectsProjectIDRobotsRobotID(
+		products.NewGetProjectsProjectIDRobotsRobotIDParamsWithContext(context.TODO()).
+			WithProjectID(projectID).
+			WithRobotID(robotID),
+		nil,
+	)
+	if err != nil {
+		return err
+	}
+
+	return harborProjectRobotAccountUpdate(d, resp.Payload)
+}
+
+func resourceHarborProjectRobotAccountUpdate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*apiclient.Harbor)
+
+	projectID, robotID, err := resourceHarborProjectRobotAccountParseID(d.Id())
+	if err != nil {
+		return err
+	}
+
+	disabled := d.Get("disabled").(bool)
+
+	_, err = client.Products.PutProjectsProjectIDRobotsRobotID(
+		products.NewPutProjectsProjectIDRobotsRobotIDParamsWithContext(context.TODO()).
+			WithProjectID(projectID).
+			WithRobotID(robotID).
+			WithRobot(&apimodels.RobotAccountUpdate{
+				Disabled: disabled,
+			}),
+		nil,
+	)
+	if err != nil {
+		return err
+	}
+
+	return resourceHarborProjectRead(d, meta)
+}
+
+func resourceHarborProjectRobotAccountDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*apiclient.Harbor)
+
+	projectID, robotID, err := resourceHarborProjectRobotAccountParseID(d.Id())
+	if err != nil {
+		return err
+	}
+
+	_, err = client.Products.DeleteProjectsProjectIDRobotsRobotID(
+		products.NewDeleteProjectsProjectIDRobotsRobotIDParamsWithContext(context.TODO()).
+			WithProjectID(projectID).
+			WithRobotID(robotID),
+		nil,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func harborProjectRobotAccountUpdate(d *schema.ResourceData, r *apimodels.RobotAccount) error {
 	d.SetId(fmt.Sprintf("%d/%d", r.ProjectID, r.ID))
 
 	attributes := map[string]interface{}{

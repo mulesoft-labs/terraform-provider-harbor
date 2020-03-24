@@ -1,3 +1,4 @@
+SHELL=/usr/bin/env bash
 TEST?=$$(go list ./...)
 GOFMT_FILES?=$$(find . -name '*.go')
 WEBSITE_REPO=github.com/sandhose/terraform-provider-harbor
@@ -43,9 +44,14 @@ test-compile:
 	fi
 	go test -c $(TEST) $(TESTARGS)
 
+# TODO(burdz): implement Extra Lint Checks <23-03-20> #
+# tfproviderlint checks: https://github.com/bflad/tfproviderlint#standard-lint-checks
+# currently ignoring:
+#   R001: check for ResourceData.Set() calls using complex key argument
 lint:
 	@echo "==> Checking source code against linters..."
 	@golangci-lint run ./$(PKG_NAME)/...
+	@tfproviderlint -AT0{01..08} -R0{02..14} -S0{01..34} -V0{01..08} ./$(PKG_NAME)
 
 tools:
 	go install github.com/bflad/tfproviderdocs

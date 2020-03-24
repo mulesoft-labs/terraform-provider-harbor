@@ -66,20 +66,7 @@ func resourceHarborConfigEmailCreate(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 
-	resp, err := client.Products.GetConfigurations(
-		products.NewGetConfigurationsParamsWithContext(context.TODO()),
-		nil,
-	)
-	if err != nil {
-		return err
-	}
-
-	err = harborConfigEmailUpdate(d, resp.Payload)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return resourceHarborConfigEmailRead(d, meta)
 }
 
 func resourceHarborConfigEmailRead(d *schema.ResourceData, meta interface{}) error {
@@ -113,20 +100,7 @@ func resourceHarborConfigEmailUpdate(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 
-	resp, err := client.Products.GetConfigurations(
-		products.NewGetConfigurationsParamsWithContext(context.TODO()),
-		nil,
-	)
-	if err != nil {
-		return err
-	}
-
-	err = harborConfigEmailUpdate(d, resp.Payload)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return resourceHarborConfigEmailRead(d, meta)
 }
 
 func resourceHarborConfigEmailDelete(d *schema.ResourceData, meta interface{}) error {

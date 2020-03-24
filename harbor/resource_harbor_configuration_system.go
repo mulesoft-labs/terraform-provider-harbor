@@ -64,20 +64,7 @@ func resourceHarborConfigSystemCreate(d *schema.ResourceData, meta interface{}) 
 		return err
 	}
 
-	resp, err := client.Products.GetConfigurations(
-		products.NewGetConfigurationsParamsWithContext(context.TODO()),
-		nil,
-	)
-	if err != nil {
-		return err
-	}
-
-	err = harborConfigSystemUpdate(d, resp.Payload)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return resourceHarborConfigSystemRead(d, meta)
 }
 
 func resourceHarborConfigSystemRead(d *schema.ResourceData, meta interface{}) error {
@@ -111,20 +98,7 @@ func resourceHarborConfigSystemUpdate(d *schema.ResourceData, meta interface{}) 
 		return err
 	}
 
-	resp, err := client.Products.GetConfigurations(
-		products.NewGetConfigurationsParamsWithContext(context.TODO()),
-		nil,
-	)
-	if err != nil {
-		return err
-	}
-
-	err = harborConfigSystemUpdate(d, resp.Payload)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return resourceHarborConfigSystemRead(d, meta)
 }
 
 func resourceHarborConfigSystemDelete(d *schema.ResourceData, meta interface{}) error {
