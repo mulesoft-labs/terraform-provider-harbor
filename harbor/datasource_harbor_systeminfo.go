@@ -63,9 +63,8 @@ func dataSourceHarborSystemInfo() *schema.Resource {
 				Computed: true,
 			},
 			"clair_vulnerability_status": {
-				Type:     schema.TypeMap,
+				Type:     schema.TypeList,
 				Computed: true,
-				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"overall_last_update": {

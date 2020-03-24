@@ -114,7 +114,6 @@ func resourceHarborProjectRobotAccountCreate(d *schema.ResourceData, meta interf
 			WithRobot(&robotAccountCreate),
 		nil,
 	)
-
 	if err != nil {
 		log.Printf("[DEBUG] Robot account creation failed")
 		return err
@@ -136,7 +135,6 @@ func resourceHarborProjectRobotAccountCreate(d *schema.ResourceData, meta interf
 			WithProjectID(projectID),
 		nil,
 	)
-
 	if err != nil {
 		log.Printf("[DEBUG] Robot account loading failed")
 		return err
@@ -149,12 +147,11 @@ func resourceHarborProjectRobotAccountCreate(d *schema.ResourceData, meta interf
 			break
 		}
 	}
-
 	if foundRobot == nil {
 		return fmt.Errorf("could not found robot %s", resp.Payload.Name)
 	}
 
-	err = resourceHarborProjectRobotAccountRefresh(d, foundRobot)
+	err = harborProjectRobotAccountUpdate(d, foundRobot)
 	if err != nil {
 		return err
 	}
@@ -195,17 +192,11 @@ func resourceHarborProjectRobotAccountRead(d *schema.ResourceData, meta interfac
 			WithRobotID(robotID),
 		nil,
 	)
-
 	if err != nil {
 		return err
 	}
 
-	err = resourceHarborProjectRobotAccountRefresh(d, resp.Payload)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return harborProjectRobotAccountUpdate(d, resp.Payload)
 }
 
 func resourceHarborProjectRobotAccountUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -227,12 +218,11 @@ func resourceHarborProjectRobotAccountUpdate(d *schema.ResourceData, meta interf
 			}),
 		nil,
 	)
-
 	if err != nil {
 		return err
 	}
 
-	return nil
+	return resourceHarborProjectRead(d, meta)
 }
 
 func resourceHarborProjectRobotAccountDelete(d *schema.ResourceData, meta interface{}) error {
@@ -249,7 +239,6 @@ func resourceHarborProjectRobotAccountDelete(d *schema.ResourceData, meta interf
 			WithRobotID(robotID),
 		nil,
 	)
-
 	if err != nil {
 		return err
 	}
@@ -257,7 +246,7 @@ func resourceHarborProjectRobotAccountDelete(d *schema.ResourceData, meta interf
 	return nil
 }
 
-func resourceHarborProjectRobotAccountRefresh(d *schema.ResourceData, r *apimodels.RobotAccount) error {
+func harborProjectRobotAccountUpdate(d *schema.ResourceData, r *apimodels.RobotAccount) error {
 	d.SetId(fmt.Sprintf("%d/%d", r.ProjectID, r.ID))
 
 	attributes := map[string]interface{}{

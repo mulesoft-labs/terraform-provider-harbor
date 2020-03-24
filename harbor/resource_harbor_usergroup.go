@@ -151,7 +151,7 @@ func resourceHarborUserGroupUpdate(d *schema.ResourceData, meta interface{}) err
 		return err
 	}
 
-	return nil
+	return resourceHarborUserGroupRead(d, meta)
 }
 
 func resourceHarborUserGroupDelete(d *schema.ResourceData, meta interface{}) error {

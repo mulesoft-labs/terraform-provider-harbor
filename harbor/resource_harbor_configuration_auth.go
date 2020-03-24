@@ -60,7 +60,6 @@ func resourceHarborConfigAuth() *schema.Resource {
 
 func resourceHarborConfigAuthCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*apiclient.Harbor)
-	authMode := d.Get("auth_mode").(string)
 
 	_, err := client.Products.PutConfigurations(
 		products.NewPutConfigurationsParamsWithContext(context.TODO()).
@@ -70,6 +69,13 @@ func resourceHarborConfigAuthCreate(d *schema.ResourceData, meta interface{}) er
 	if err != nil {
 		return err
 	}
+
+	return resourceHarborConfigAuthRead(d, meta)
+}
+
+func resourceHarborConfigAuthRead(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*apiclient.Harbor)
+	authMode := d.Get("auth_mode").(string)
 
 	resp, err := client.Products.GetConfigurations(
 		products.NewGetConfigurationsParamsWithContext(context.TODO()),
@@ -81,25 +87,6 @@ func resourceHarborConfigAuthCreate(d *schema.ResourceData, meta interface{}) er
 
 	if resp.Payload.AuthMode.Value != authMode {
 		return fmt.Errorf("auth_mode not set correctly")
-	}
-
-	err = harborConfigAuthUpdate(d, resp.Payload)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func resourceHarborConfigAuthRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*apiclient.Harbor)
-
-	resp, err := client.Products.GetConfigurations(
-		products.NewGetConfigurationsParamsWithContext(context.TODO()),
-		nil,
-	)
-	if err != nil {
-		return err
 	}
 
 	err = harborConfigAuthUpdate(d, resp.Payload)
@@ -112,7 +99,6 @@ func resourceHarborConfigAuthRead(d *schema.ResourceData, meta interface{}) erro
 
 func resourceHarborConfigAuthUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*apiclient.Harbor)
-	authMode := d.Get("auth_mode").(string)
 
 	_, err := client.Products.PutConfigurations(
 		products.NewPutConfigurationsParamsWithContext(context.TODO()).
@@ -123,24 +109,7 @@ func resourceHarborConfigAuthUpdate(d *schema.ResourceData, meta interface{}) er
 		return err
 	}
 
-	resp, err := client.Products.GetConfigurations(
-		products.NewGetConfigurationsParamsWithContext(context.TODO()),
-		nil,
-	)
-	if err != nil {
-		return err
-	}
-
-	if resp.Payload.AuthMode.Value != authMode {
-		return fmt.Errorf("auth_mode not set correctly")
-	}
-
-	err = harborConfigAuthUpdate(d, resp.Payload)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return resourceHarborConfigAuthRead(d, meta)
 }
 
 func resourceHarborConfigAuthDelete(d *schema.ResourceData, meta interface{}) error {

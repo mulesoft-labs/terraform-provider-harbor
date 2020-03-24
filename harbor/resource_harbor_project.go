@@ -118,7 +118,6 @@ func resourceHarborProjectCreate(d *schema.ResourceData, meta interface{}) error
 			WithProject(projectParams),
 		nil,
 	)
-
 	if err != nil {
 		return err
 	}
@@ -128,7 +127,6 @@ func resourceHarborProjectCreate(d *schema.ResourceData, meta interface{}) error
 			WithName(&name),
 		nil,
 	)
-
 	if err != nil {
 		return err
 	}
@@ -140,7 +138,6 @@ func resourceHarborProjectCreate(d *schema.ResourceData, meta interface{}) error
 			break
 		}
 	}
-
 	if project == nil {
 		return fmt.Errorf("Project not found")
 	}
@@ -209,7 +206,7 @@ func resourceHarborProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 
-	return nil
+	return resourceHarborProjectRead(d, meta)
 }
 
 func resourceHarborProjectDelete(d *schema.ResourceData, meta interface{}) error {
