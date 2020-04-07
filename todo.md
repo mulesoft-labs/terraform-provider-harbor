@@ -2,7 +2,7 @@
 # Resources to implement
 
 - [x] `harbor_project`
-- [ ] `harbor_project_member`
+- [x] `harbor_project_member`
 - [x] `harbor_project_robot_account`
 - [ ] `harbor_reposoitory`
 - [ ] `harbor_repository_label`
@@ -42,4 +42,3 @@
 <!-- project quotas -->
 <!-- garbage collection -->
 <!-- project tag retention, immutability, webhooks, scanner, config -->
-
