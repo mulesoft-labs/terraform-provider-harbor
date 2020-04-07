@@ -7,7 +7,7 @@ require (
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/aws/aws-sdk-go v1.29.30 // indirect
 	github.com/bflad/tfproviderdocs v0.5.0
-	github.com/bflad/tfproviderlint v0.13.0
+	github.com/bflad/tfproviderlint v0.14.0
 	github.com/client9/misspell v0.3.4
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/go-openapi/errors v0.19.4
@@ -35,8 +35,7 @@ require (
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/zclconf/go-cty v1.3.1 // indirect
 	golang.org/x/crypto v0.0.0-20200323165209-0ec3e9974c59 // indirect
-	golang.org/x/net v0.0.0-20200320220750-118fecf932d8 // indirect
-	golang.org/x/sys v0.0.0-20200321134203-328b4cd54aae // indirect
-	golang.org/x/tools v0.0.0-20200323210725-ef1313dc6d0a // indirect
+	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e // indirect
+	golang.org/x/tools v0.0.0-20200324175852-6fb6f5a9fc59 // indirect
 	google.golang.org/genproto v0.0.0-20200323114720-3f67cca34472 // indirect
 )
